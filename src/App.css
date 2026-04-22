@@ -1,0 +1,219 @@
+/* ===== LAYOUT GENERAL ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #212121;
+  color: #ececec;
+  font-family: "Inter", sans-serif;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background-color: #171717;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 8px;
+  gap: 8px;
+  border-right: 1px solid #2f2f2f;
+  overflow-y: auto;
+}
+
+.btn-nuevo-chat {
+  background-color: #2f2f2f;
+  color: #ececec;
+  border: 1px solid #3f3f3f;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.btn-nuevo-chat:hover {
+  background-color: #3a3a3a;
+}
+
+/* ===== LISTA DE CHATS ===== */
+.chat-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chat-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 14px;
+  color: #ececec;
+}
+
+.chat-list-item:hover {
+  background-color: #2f2f2f;
+}
+
+.chat-list-item.activo {
+  background-color: #2f2f2f;
+}
+
+.chat-titulo {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-eliminar {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  padding: 2px 4px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.chat-list-item:hover .btn-eliminar {
+  opacity: 1;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== MODO CLARO ===== */
+body.claro {
+  background-color: #f9f9f9;
+  color: #1a1a1a;
+}
+
+body.claro .sidebar {
+  background-color: #efefef;
+  border-right: 1px solid #ddd;
+}
+
+body.claro .btn-nuevo-chat {
+  background-color: #e0e0e0;
+  color: #1a1a1a;
+  border-color: #ccc;
+}
+
+body.claro .btn-nuevo-chat:hover {
+  background-color: #d0d0d0;
+}
+
+body.claro .chat-list-item {
+  color: #2a2a2a;
+  font-weight: 500;
+}
+
+body.claro .chat-titulo {
+  color: #2a2a2a;
+}
+
+body.claro .chat-list-item:hover,
+body.claro .chat-list-item.activo {
+  background-color: #e0e0e0;
+}
+
+/* ===== MODAL DE CONFIRMACIÓN ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background-color: #2f2f2f;
+  border: 1px solid #3f3f3f;
+  border-radius: 12px;
+  padding: 24px;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: #ececec;
+  font-size: 15px;
+  text-align: center;
+}
+
+.modal-botones {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.modal-btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.modal-btn.cancelar {
+  background-color: #3f3f3f;
+  color: #ececec;
+}
+
+.modal-btn.cancelar:hover {
+  background-color: #4f4f4f;
+}
+
+.modal-btn.eliminar {
+  background-color: #e53935;
+  color: #fff;
+}
+
+.modal-btn.eliminar:hover {
+  background-color: #c62828;
+}
+
+/* Modal en modo claro */
+body.claro .modal {
+  background-color: #ffffff;
+  border-color: #ddd;
+  color: #1a1a1a;
+}
+
+body.claro .modal-btn.cancelar {
+  background-color: #e0e0e0;
+  color: #1a1a1a;
+}
+
+body.claro .modal-btn.cancelar:hover {
+  background-color: #d0d0d0;
+}
