@@ -31,6 +31,8 @@ body {
     align-items: center;
     justify-content: flex-start;
     gap: 10px;
+    background-color: #212121;
+    min-height: 57px;
 }
 
 .chat-header-title {
@@ -235,13 +237,17 @@ body {
 .bubble-ai ul,
 .bubble-ai ol {
     padding-left: 20px;
-    margin: 8px 0;
+    margin: 4px 0;
     text-align: left;
 }
 
 .bubble-ai li {
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     text-align: left;
+}
+
+.bubble-ai li p {
+    margin: 0;
 }
 
 .bubble-ai h1,
@@ -302,6 +308,7 @@ body.claro .chat-container {
 }
 
 body.claro .chat-header {
+    background-color: #f9f9f9;
     border-bottom-color: #ddd;
 }
 

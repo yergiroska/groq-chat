@@ -4,10 +4,11 @@ import "./GroqChat.css";
 
 const API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
-export default function GroqChat({ mensajesIniciales = [], onActualizarMensajes, tema, onToggleTema }) {
+export default function GroqChat({ mensajesIniciales = [], onActualizarMensajes, tema, onToggleTema, tituloChatActivo }) {
     const [mensaje, setMensaje] = useState("");
     const [mensajes, setMensajes] = useState(mensajesIniciales);
     const [cargando, setCargando] = useState(false);
+    const [streaming, setStreaming] = useState(false);
     const bottomRef = useRef(null);
 
     useEffect(() => {
@@ -23,9 +24,16 @@ export default function GroqChat({ mensajesIniciales = [], onActualizarMensajes,
         ];
 
         setMensajes(nuevosMensajes);
-        onActualizarMensajes(nuevosMensajes); //  notifica a App
+        onActualizarMensajes(nuevosMensajes);
         setMensaje("");
         setCargando(true);
+
+        // Agregamos un mensaje vacío de la IA que iremos llenando
+        const mensajesConRespuesta = [
+            ...nuevosMensajes,
+            { role: "assistant", content: "" },
+        ];
+        setMensajes(mensajesConRespuesta);
 
         try {
             const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -37,17 +45,58 @@ export default function GroqChat({ mensajesIniciales = [], onActualizarMensajes,
                 body: JSON.stringify({
                     model: "llama-3.1-8b-instant",
                     messages: nuevosMensajes,
+                    stream: true, // activamos streaming
                 }),
             });
 
-            const data = await res.json();
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder();
+            let textoCompleto = "";
+            setStreaming(true);
 
-            if (data.choices) {
-                const respuestaIA = data.choices[0].message;
-                const mensajesFinales = [...nuevosMensajes, respuestaIA];
-                setMensajes(mensajesFinales);
-                onActualizarMensajes(mensajesFinales); //  notifica a App con respuesta IA
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                // Decodificamos el trozo recibido
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split("\n").filter(line => line.trim() !== "");
+
+                for (const line of lines) {
+                    if (line === "data: [DONE]") break;
+                    if (!line.startsWith("data: ")) continue;
+
+                    try {
+                        const json = JSON.parse(line.replace("data: ", ""));
+                        const delta = json.choices?.[0]?.delta?.content;
+
+                        if (delta) {
+                            textoCompleto += delta;
+
+                            // Actualizamos el último mensaje con el texto acumulado
+                            setMensajes(prev => {
+                                const actualizados = [...prev];
+                                actualizados[actualizados.length - 1] = {
+                                    role: "assistant",
+                                    content: textoCompleto,
+                                };
+                                return actualizados;
+                            });
+                        }
+                    } catch (e) {
+                        // Ignoramos líneas que no son JSON válido
+                    }
+                }
             }
+
+            // Guardamos el mensaje final en App
+            const mensajesFinales = [
+                ...nuevosMensajes,
+                { role: "assistant", content: textoCompleto },
+            ];
+            setStreaming(false);
+            onActualizarMensajes(mensajesFinales);
+
         } catch (error) {
             console.error("Error al contactar la API:", error);
         } finally {
@@ -68,11 +117,8 @@ export default function GroqChat({ mensajesIniciales = [], onActualizarMensajes,
 
             {/* HEADER */}
             <header className="chat-header">
-            <span className="chat-header-title">ChatGroq</span>
-            <button className="btn-tema" onClick={onToggleTema}>
-                {tema === "oscuro" ? "☀️" : "🌙"}
-            </button>
-        </header>
+                <span className="chat-header-title">{tituloChatActivo}</span>
+            </header>
 
             {/* ÁREA DE MENSAJES */}
             <main className="chat-messages">
@@ -91,8 +137,38 @@ export default function GroqChat({ mensajesIniciales = [], onActualizarMensajes,
                         <div className={`chat-bubble ${msg.role === "user" ? "bubble-user" : "bubble-ai"}`}>
                             {msg.role === "user" ? (
                                 msg.content
+                            ) : streaming && index === mensajes.length - 1 ? (
+                                <span style={{ whiteSpace: "pre-wrap" }}>{msg.content}</span>
                             ) : (
-                                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                                <ReactMarkdown
+                                    components={{
+                                        p: ({ node, ...props }) => (
+                                            <p style={{ margin: "4px 0" }} {...props} />
+                                        ),
+                                        li: ({ node, children, ...props }) => (
+                                            <li style={{ marginBottom: "2px" }} {...props}>
+                                                {children}
+                                            </li>
+                                        ),
+                                        h1: ({ node, ...props }) => (
+                                            <h1 style={{ margin: "8px 0 4px" }} {...props} />
+                                        ),
+                                        h2: ({ node, ...props }) => (
+                                            <h2 style={{ margin: "8px 0 4px" }} {...props} />
+                                        ),
+                                        h3: ({ node, ...props }) => (
+                                            <h3 style={{ margin: "6px 0 2px" }} {...props} />
+                                        ),
+                                        ul: ({ node, ...props }) => (
+                                            <ul style={{ margin: "2px 0", paddingLeft: "20px" }} {...props} />
+                                        ),
+                                        ol: ({ node, ...props }) => (
+                                            <ol style={{ margin: "2px 0", paddingLeft: "20px" }} {...props} />
+                                        ),
+                                    }}
+                                >
+                                    {msg.content}
+                                </ReactMarkdown>
                             )}
                         </div>
                     </div>
