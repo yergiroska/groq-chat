@@ -26,7 +26,7 @@ body {
 /* ===== HEADER ===== */
 .chat-header {
     padding: 16px 24px;
-    border-bottom: 1px solid #2f2f2f;
+    border-bottom: none;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -150,7 +150,7 @@ body {
 /* ===== FOOTER / INPUT ===== */
 .chat-footer {
     padding: 12px 16px 16px;
-    border-top: 1px solid #2f2f2f;
+    border-top: none;
 }
 
 .chat-input-wrapper {
@@ -335,7 +335,7 @@ body.claro .bubble-ai strong {
 }
 
 body.claro .chat-footer {
-    border-top-color: #ddd;
+    border-top: none;
     background-color: #f9f9f9;
 }
 
@@ -380,4 +380,53 @@ body.claro .chat-welcome p {
 
 .chat-input::-webkit-scrollbar-track {
     background: transparent;
+}
+
+/* ===== BOTÓN MENÚ MÓVIL ===== */
+.btn-menu-movil {
+    display: none;
+    background: none;
+    border: none;
+    color: #ececec;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.btn-menu-movil:hover {
+    background-color: #3f3f3f;
+}
+
+body.claro .btn-menu-movil {
+    color: #1a1a1a;
+}
+
+body.claro .btn-menu-movil:hover {
+    background-color: #e0e0e0;
+}
+
+@media (max-width: 768px) {
+    .btn-menu-movil {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .chat-messages > * {
+        max-width: 100%;
+    }
+
+    .chat-input-wrapper {
+        max-width: 100%;
+    }
+
+    .chat-disclaimer {
+        max-width: 100%;
+    }
+
+    .bubble-user {
+        max-width: 85%;
+    }
 }

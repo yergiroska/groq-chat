@@ -94,6 +94,7 @@ body {
   padding: 2px 4px;
   border-radius: 4px;
   flex-shrink: 0;
+  color: #8e8ea0;
 }
 
 .chat-list-item:hover .btn-eliminar {
@@ -141,6 +142,10 @@ body.claro .chat-titulo {
 body.claro .chat-list-item:hover,
 body.claro .chat-list-item.activo {
   background-color: #e0e0e0;
+}
+
+body.claro .btn-eliminar {
+  color: #666;
 }
 
 /* ===== MODAL DE CONFIRMACIÓN ===== */
@@ -410,4 +415,67 @@ body.claro .busqueda-item:hover {
 
 body.claro .btn-tema-sidebar:hover {
   background-color: #e0e0e0;
+}
+
+/* ===== LOGO ===== */
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-logo {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+/* ===== RESPONSIVE MÓVIL ===== */
+@media (max-width: 768px) {
+  .app-layout {
+    position: relative;
+  }
+
+  .btn-eliminar {
+    opacity: 1 !important;
+    color: #8e8ea0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    height: 100vh;
+    z-index: 50;
+    transition: left 0.3s ease;
+    width: 80%;
+    max-width: 300px;
+  }
+
+  .sidebar.sidebar-abierto {
+    left: 0;
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 40;
+    display: block !important;
+  }
+
+  .main-content {
+    width: 100%;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* En escritorio el overlay nunca se muestra */
+@media (min-width: 769px) {
+  .sidebar-overlay {
+    display: none;
+  }
 }

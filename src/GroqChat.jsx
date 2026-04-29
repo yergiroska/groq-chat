@@ -4,7 +4,7 @@ import "./GroqChat.css";
 
 const API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
-export default function GroqChat({ mensajesIniciales = [], onActualizarMensajes, tema, onToggleTema, tituloChatActivo }) {
+export default function GroqChat({ mensajesIniciales = [], onActualizarMensajes, tema, onToggleTema, tituloChatActivo, onAbrirSidebar }) {
     const [mensaje, setMensaje] = useState("");
     const [mensajes, setMensajes] = useState(mensajesIniciales);
     const [cargando, setCargando] = useState(false);
@@ -44,8 +44,14 @@ export default function GroqChat({ mensajesIniciales = [], onActualizarMensajes,
                 },
                 body: JSON.stringify({
                     model: "llama-3.1-8b-instant",
-                    messages: nuevosMensajes,
-                    stream: true, // activamos streaming
+                    messages: [
+                        {
+                            role: "system",
+                            content: "Eres un asistente útil y amigable. Responde siempre en español, independientemente del idioma en que te escriban."
+                        },
+                        ...nuevosMensajes
+                    ],
+                    stream: true,
                 }),
             });
 
@@ -117,6 +123,9 @@ export default function GroqChat({ mensajesIniciales = [], onActualizarMensajes,
 
             {/* HEADER */}
             <header className="chat-header">
+                <button className="btn-menu-movil" onClick={onAbrirSidebar}>
+                    ☰
+                </button>
                 <span className="chat-header-title">{tituloChatActivo}</span>
             </header>
 

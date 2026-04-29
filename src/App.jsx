@@ -47,6 +47,7 @@ export default function App() {
 
   const [mostrarBusqueda, setMostrarBusqueda] = useState(false);
   const [textoBusqueda, setTextoBusqueda] = useState("");
+  const [sidebarAbierto, setSidebarAbierto] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("chats", JSON.stringify(chats));
@@ -130,10 +131,24 @@ export default function App() {
 
   return (
       <div className="app-layout">
+        {/* OVERLAY para cerrar sidebar en móvil */}
+        {sidebarAbierto && (
+            <div
+                className="sidebar-overlay"
+                onClick={() => setSidebarAbierto(false)}
+            />
+        )}
+
         {/* SIDEBAR */}
-        <aside className="sidebar">
+        <aside className={`sidebar ${sidebarAbierto ? "sidebar-abierto" : ""}`}>
           <div className="sidebar-header">
-            <span className="sidebar-title">ChatGroq</span>
+            <div className="sidebar-brand">
+              <svg className="sidebar-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="16" cy="16" r="15" fill="#2f6feb" />
+                <path d="M18 4L8 18h8l-2 10 14-16h-8l2-8z" fill="white" />
+              </svg>
+              <span className="sidebar-title">ChatGroq</span>
+            </div>
             <button className="btn-tema-sidebar" onClick={handleToggleTema}>
               {tema === "oscuro" ? "☀️" : "🌙"}
             </button>
@@ -156,7 +171,10 @@ export default function App() {
                 <li
                     key={chat.id}
                     className={`chat-list-item ${chat.id === chatActivoId ? "activo" : ""}`}
-                    onClick={() => handleCambiarChat(chat.id)}
+                    onClick={() => {
+                      handleCambiarChat(chat.id);
+                      setSidebarAbierto(false); // 👈 cierra sidebar al seleccionar chat en móvil
+                    }}
                 >
                   <span className="chat-titulo">{chat.titulo}</span>
                   <button
@@ -182,6 +200,7 @@ export default function App() {
               tema={tema}
               onToggleTema={handleToggleTema}
               tituloChatActivo={chatActivo?.titulo || "Nuevo chat"}
+              onAbrirSidebar={() => setSidebarAbierto(true)}
           />
         </main>
 
