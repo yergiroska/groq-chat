@@ -1,16 +1,8 @@
 /* ===== RESET & BASE ===== */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
 body {
     background-color: #212121;
     color: #ececec;
     font-family: "Söhne", "Inter", sans-serif;
-    height: 100vh;
-    overflow: hidden;
 }
 
 /* ===== CONTENEDOR PRINCIPAL ===== */
@@ -107,7 +99,7 @@ body {
     border-radius: 18px;
     font-size: 15px;
     line-height: 1.6;
-    white-space: pre-wrap;
+    /*white-space: pre-wrap;*/
     word-break: break-word;
 }
 
@@ -287,21 +279,6 @@ body {
     text-align: left;
 }
 
-/* ===== BOTÓN TEMA ===== */
-.btn-tema {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 20px;
-    padding: 4px 8px;
-    border-radius: 8px;
-    transition: background-color 0.2s;
-    flex-shrink: 0;
-}
-
-.btn-tema:hover {
-    background-color: #3f3f3f;
-}
 
 body.claro .chat-container {
     background-color: #f9f9f9;
@@ -356,9 +333,6 @@ body.claro .chat-disclaimer {
     color: #999;
 }
 
-body.claro .btn-tema:hover {
-    background-color: #e0e0e0;
-}
 
 body.claro .chat-welcome h1 {
     color: #1a1a1a;
@@ -429,4 +403,78 @@ body.claro .btn-menu-movil:hover {
     .bubble-user {
         max-width: 85%;
     }
+}
+
+/* ===== ANIMACIÓN MENSAJES ===== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chat-bubble-wrapper {
+    animation: fadeInUp 0.3s ease;
+}
+
+/* ===== BOTONES COPIAR ===== */
+.chat-bubble-wrapper.ai {
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+}
+
+/* Esquina superior derecha */
+.bubble-copiar-top {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+/* Barra debajo a la izquierda */
+.bubble-acciones {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    padding-left: 4px;
+}
+
+.chat-bubble-wrapper:hover .bubble-copiar-top,
+.chat-bubble-wrapper:hover .bubble-acciones {
+    opacity: 1;
+}
+
+.btn-copiar {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    color: #8e8ea0;
+    transition: background-color 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-copiar:hover {
+    background-color: #3f3f3f;
+    color: #ececec;
+}
+
+body.claro .btn-copiar {
+    color: #999;
+}
+
+body.claro .btn-copiar:hover {
+    background-color: #e0e0e0;
+    color: #1a1a1a;
 }

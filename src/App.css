@@ -1,16 +1,8 @@
 /* ===== LAYOUT GENERAL ===== */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 body {
   background-color: #212121;
   color: #ececec;
-  font-family: "Inter", sans-serif;
-  height: 100vh;
-  overflow: hidden;
+  font-family: "Söhne", "Inter", sans-serif;
 }
 
 .app-layout {
@@ -164,7 +156,7 @@ body.claro .btn-eliminar {
   border: 1px solid #3f3f3f;
   border-radius: 12px;
   padding: 24px;
-  width: 320px;
+  width: 400px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -478,4 +470,114 @@ body.claro .btn-tema-sidebar:hover {
   .sidebar-overlay {
     display: none;
   }
+}
+
+/* ===== MENÚ 3 PUNTOS ===== */
+.btn-menu-chat {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #8e8ea0;
+  font-size: 18px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.chat-list-item:hover .btn-menu-chat {
+  opacity: 1;
+}
+
+.chat-list-item .btn-menu-chat:hover {
+  background-color: #3f3f3f;
+  color: #ececec;
+}
+
+.menu-chat {
+  position: absolute;
+  right: 8px;
+  top: 36px;
+  background-color: #2f2f2f;
+  border: 1px solid #3f3f3f;
+  border-radius: 8px;
+  padding: 4px;
+  z-index: 100;
+  min-width: 150px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.menu-chat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ececec;
+  font-size: 14px;
+  border-radius: 6px;
+  text-align: left;
+  transition: background-color 0.2s;
+}
+
+.menu-chat-item:hover {
+  background-color: #3f3f3f;
+}
+
+.menu-chat-item.eliminar {
+  color: #e53935;
+}
+
+.chat-list-item {
+  position: relative;
+}
+
+/* Modal input */
+.modal-input {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: #3f3f3f;
+  border: 1px solid #555;
+  border-radius: 8px;
+  color: #ececec;
+  font-size: 14px;
+  outline: none;
+}
+
+.modal-input:focus {
+  border-color: #2f6feb;
+}
+
+/* Modo claro */
+body.claro .btn-menu-chat {
+  color: #999;
+}
+
+body.claro .chat-list-item .btn-menu-chat:hover {
+  background-color: #e0e0e0;
+  color: #1a1a1a;
+}
+
+body.claro .menu-chat {
+  background-color: #ffffff;
+  border-color: #ddd;
+}
+
+body.claro .menu-chat-item {
+  color: #1a1a1a;
+}
+
+body.claro .menu-chat-item:hover {
+  background-color: #f0f0f0;
+}
+
+body.claro .modal-input {
+  background-color: #f0f0f0;
+  border-color: #ccc;
+  color: #1a1a1a;
 }

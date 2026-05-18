@@ -13,7 +13,6 @@ const cargarChatsIniciales = () => {
     const guardados = localStorage.getItem("chats");
     if (guardados) {
       const parsed = JSON.parse(guardados);
-      // Filtramos chats vacíos al cargar
       const conMensajes = parsed.filter(c => c.mensajes.length > 0);
       if (conMensajes.length > 0) return conMensajes;
     }
@@ -37,20 +36,29 @@ const cargarChatActivoInicial = (chats) => {
 
 export default function App() {
   const [chats, setChats] = useState(cargarChatsIniciales);
-  const [chatActivoId, setChatActivoId] = useState(() =>
-      cargarChatActivoInicial(cargarChatsIniciales())
-  );
+  const [chatActivoId, setChatActivoId] = useState(() => {
+    const inicial = cargarChatsIniciales();
+    return cargarChatActivoInicial(inicial);
+  });
   const [chatAEliminar, setChatAEliminar] = useState(null);
   const [tema, setTema] = useState(() => {
     return localStorage.getItem("tema") || "oscuro";
   });
-
   const [mostrarBusqueda, setMostrarBusqueda] = useState(false);
   const [textoBusqueda, setTextoBusqueda] = useState("");
   const [sidebarAbierto, setSidebarAbierto] = useState(false);
+  const [menuAbierto, setMenuAbierto] = useState(null);
+  const [chatRenombrando, setChatRenombrando] = useState(null);
+  const [nuevoTitulo, setNuevoTitulo] = useState("");
 
   useEffect(() => {
-    localStorage.setItem("chats", JSON.stringify(chats));
+    try {
+      localStorage.setItem("chats", JSON.stringify(chats));
+    } catch (e) {
+      if (e instanceof Error && e.name === "QuotaExceededError") {
+        console.warn("localStorage lleno: no se pudieron guardar los chats.");
+      }
+    }
   }, [chats]);
 
   useEffect(() => {
@@ -66,9 +74,7 @@ export default function App() {
 
   const chatsFiltrados = chats.filter(c => {
     const texto = textoBusqueda.toLowerCase();
-    // Busca en el título
     const enTitulo = c.titulo.toLowerCase().includes(texto);
-    // Busca en el contenido de los mensajes
     const enMensajes = c.mensajes.some(m =>
         m.content.toLowerCase().includes(texto)
     );
@@ -76,7 +82,6 @@ export default function App() {
   });
 
   const handleNuevoChat = () => {
-    // Si el chat activo ya está vacío, no crear otro
     if (chatActivo && chatActivo.mensajes.length === 0) return;
     const nuevo = crearChat(Date.now());
     setChats((prev) => [...prev, nuevo]);
@@ -84,7 +89,6 @@ export default function App() {
   };
 
   const handleCambiarChat = (id) => {
-    // Elimina chats vacíos excepto el que vamos a activar
     setChats(prev => prev.filter(c => c.mensajes.length > 0 || c.id === id));
     setChatActivoId(id);
   };
@@ -95,7 +99,6 @@ export default function App() {
 
   const confirmarEliminar = () => {
     const restantes = chats.filter((c) => c.id !== chatAEliminar);
-
     if (restantes.length === 0) {
       const nuevo = crearChat(Date.now());
       setChats([nuevo]);
@@ -106,20 +109,34 @@ export default function App() {
         setChatActivoId(restantes[0].id);
       }
     }
-
     setChatAEliminar(null);
+  };
+
+  const handleRenombrar = (id) => {
+    const chat = chats.find(c => c.id === id);
+    setChatRenombrando(id);
+    setNuevoTitulo(chat.titulo.replace(/\.\.\.$/, ""));
+    setMenuAbierto(null);
+  };
+
+  const confirmarRenombrar = () => {
+    if (!nuevoTitulo.trim()) return;
+    setChats(prev => prev.map(c =>
+        c.id === chatRenombrando ? { ...c, titulo: nuevoTitulo.trim() } : c
+    ));
+    setChatRenombrando(null);
+    setNuevoTitulo("");
   };
 
   const handleActualizarMensajes = (nuevosMensajes) => {
     setChats((prev) =>
         prev.map((c) => {
           if (c.id !== chatActivoId) return c;
-
+          const raw = nuevosMensajes[0]?.content ?? "";
           const titulo =
               c.titulo === "Nuevo chat" && nuevosMensajes.length > 0
-                  ? nuevosMensajes[0].content.slice(0, 28) + "..."
+                  ? raw.length > 50 ? raw.slice(0, 50) + "..." : raw
                   : c.titulo;
-
           return { ...c, mensajes: nuevosMensajes, titulo };
         })
     );
@@ -131,15 +148,10 @@ export default function App() {
 
   return (
       <div className="app-layout">
-        {/* OVERLAY para cerrar sidebar en móvil */}
         {sidebarAbierto && (
-            <div
-                className="sidebar-overlay"
-                onClick={() => setSidebarAbierto(false)}
-            />
+            <div className="sidebar-overlay" onClick={() => setSidebarAbierto(false)} />
         )}
 
-        {/* SIDEBAR */}
         <aside className={`sidebar ${sidebarAbierto ? "sidebar-abierto" : ""}`}>
           <div className="sidebar-header">
             <div className="sidebar-brand">
@@ -147,7 +159,7 @@ export default function App() {
                 <circle cx="16" cy="16" r="15" fill="#2f6feb" />
                 <path d="M18 4L8 18h8l-2 10 14-16h-8l2-8z" fill="white" />
               </svg>
-              <span className="sidebar-title">ChatGroq</span>
+              <span className="sidebar-title">Destello</span>
             </div>
             <button className="btn-tema-sidebar" onClick={handleToggleTema}>
               {tema === "oscuro" ? "☀️" : "🌙"}
@@ -173,38 +185,49 @@ export default function App() {
                     className={`chat-list-item ${chat.id === chatActivoId ? "activo" : ""}`}
                     onClick={() => {
                       handleCambiarChat(chat.id);
-                      setSidebarAbierto(false); // 👈 cierra sidebar al seleccionar chat en móvil
+                      setSidebarAbierto(false);
                     }}
                 >
                   <span className="chat-titulo">{chat.titulo}</span>
+
                   <button
-                      className="btn-eliminar"
+                      className="btn-menu-chat"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleEliminarChat(chat.id);
+                        setMenuAbierto(menuAbierto === chat.id ? null : chat.id);
                       }}
                   >
-                    ✕
+                    ⋮
                   </button>
+
+                  {menuAbierto === chat.id && (
+                      <div className="menu-chat" onClick={(e) => e.stopPropagation()}>
+                        <button className="menu-chat-item" onClick={() => handleRenombrar(chat.id)}>
+                          ✏️ Renombrar
+                        </button>
+                        <button className="menu-chat-item eliminar" onClick={() => {
+                          setMenuAbierto(null);
+                          handleEliminarChat(chat.id);
+                        }}>
+                          🗑️ Eliminar
+                        </button>
+                      </div>
+                  )}
                 </li>
             ))}
           </ul>
         </aside>
 
-        {/* CHAT PRINCIPAL */}
         <main className="main-content">
           <GroqChat
               key={chatActivo.id}
               mensajesIniciales={chatActivo.mensajes}
               onActualizarMensajes={handleActualizarMensajes}
-              tema={tema}
-              onToggleTema={handleToggleTema}
               tituloChatActivo={chatActivo?.titulo || "Nuevo chat"}
               onAbrirSidebar={() => setSidebarAbierto(true)}
           />
         </main>
 
-        {/* MODAL ELIMINAR */}
         {chatAEliminar && (
             <div className="modal-overlay">
               <div className="modal">
@@ -221,7 +244,6 @@ export default function App() {
             </div>
         )}
 
-        {/* MODAL BÚSQUEDA */}
         {mostrarBusqueda && (
             <div className="modal-overlay" onClick={() => setMostrarBusqueda(false)}>
               <div className="modal-busqueda" onClick={(e) => e.stopPropagation()}>
@@ -237,7 +259,6 @@ export default function App() {
                   />
                   <button className="busqueda-cerrar" onClick={() => setMostrarBusqueda(false)}>✕</button>
                 </div>
-
                 <ul className="busqueda-resultados">
                   {chatsFiltrados.length > 0 ? (
                       chatsFiltrados.map(chat => (
@@ -257,6 +278,31 @@ export default function App() {
                       <li className="busqueda-vacio">No se encontraron chats</li>
                   )}
                 </ul>
+              </div>
+            </div>
+        )}
+
+        {chatRenombrando && (
+            <div className="modal-overlay" onClick={() => setChatRenombrando(null)}>
+              <div className="modal" onClick={(e) => e.stopPropagation()}>
+                <p>Renombrar chat</p>
+                <input
+                    className="modal-input"
+                    type="text"
+                    value={nuevoTitulo}
+                    onChange={(e) => setNuevoTitulo(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && confirmarRenombrar()}
+                    autoFocus
+                />
+                <div className="modal-botones">
+                  <button className="modal-btn cancelar" onClick={() => setChatRenombrando(null)}>
+                    Cancelar
+                  </button>
+                  <button className="modal-btn eliminar" onClick={confirmarRenombrar}
+                          style={{ backgroundColor: "#2f6feb" }}>
+                    Guardar
+                  </button>
+                </div>
               </div>
             </div>
         )}
