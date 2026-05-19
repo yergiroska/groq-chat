@@ -426,6 +426,8 @@ body.claro .btn-tema-sidebar:hover {
 @media (max-width: 768px) {
   .app-layout {
     position: relative;
+    height: 100dvh;
+    overflow: hidden;
   }
 
   .btn-eliminar {
@@ -462,6 +464,10 @@ body.claro .btn-tema-sidebar:hover {
     width: 100%;
     position: relative;
     z-index: 1;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 }
 
