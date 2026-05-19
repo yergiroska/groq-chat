@@ -25,24 +25,13 @@ body {
     gap: 10px;
     background-color: #212121;
     min-height: 57px;
+    flex-shrink: 0;
 }
 
 .chat-header-title {
     font-size: 18px;
     font-weight: 600;
     color: #ececec;
-}
-
-@media (max-width: 768px) {
-    .chat-header {
-        border-bottom: 1px solid #2f2f2f;
-        padding: 12px 16px;
-    }
-
-    body.claro .chat-header {
-        background-color: #f9f9f9;
-        border-bottom: 1px solid #ddd;
-    }
 }
 
 /* ===== ÁREA DE MENSAJES ===== */
@@ -54,6 +43,7 @@ body {
     flex-direction: column;
     gap: 12px;
     scroll-behavior: smooth;
+    min-height: 0;
 }
 
 /* Centra el contenido de los mensajes */
@@ -111,7 +101,6 @@ body {
     border-radius: 18px;
     font-size: 15px;
     line-height: 1.6;
-    /*white-space: pre-wrap;*/
     word-break: break-word;
 }
 
@@ -155,6 +144,7 @@ body {
 .chat-footer {
     padding: 12px 16px 16px;
     border-top: none;
+    flex-shrink: 0;
 }
 
 .chat-input-wrapper {
@@ -165,9 +155,9 @@ body {
     border: 1px solid #3f3f3f;
     border-radius: 14px;
     padding: 10px 12px;
-    max-width: 750px;        /*  limita el ancho */
-    width: 100%;             /*  responsive */
-    margin: 0 auto;          /*  centra horizontalmente */
+    max-width: 750px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 .chat-input {
@@ -291,7 +281,7 @@ body {
     text-align: left;
 }
 
-
+/* ===== MODO CLARO ===== */
 body.claro .chat-container {
     background-color: #f9f9f9;
 }
@@ -345,7 +335,6 @@ body.claro .chat-disclaimer {
     color: #999;
 }
 
-
 body.claro .chat-welcome h1 {
     color: #1a1a1a;
 }
@@ -393,7 +382,26 @@ body.claro .btn-menu-movil:hover {
     background-color: #e0e0e0;
 }
 
+/* ===== RESPONSIVE MÓVIL ===== */
 @media (max-width: 768px) {
+    .chat-container {
+        height: 100dvh;
+    }
+
+    .chat-header {
+        border-bottom: 1px solid #2f2f2f;
+        padding: 12px 16px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background-color: #212121;
+    }
+
+    body.claro .chat-header {
+        background-color: #f9f9f9;
+        border-bottom: 1px solid #ddd;
+    }
+
     .btn-menu-movil {
         display: flex;
         align-items: center;
