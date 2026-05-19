@@ -122,7 +122,7 @@ export default function GroqChat({ mensajesIniciales = [], onActualizarMensajes,
         <div className="chat-container">
 
             {/* HEADER */}
-            <header className="chat-header" style={{backgroundColor: 'red', minHeight: '60px'}}>
+            <header className="chat-header">
                 <button className="btn-menu-movil" onClick={onAbrirSidebar}>
                     ☰
                 </button>
