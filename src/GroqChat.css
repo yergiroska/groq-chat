@@ -33,6 +33,18 @@ body {
     color: #ececec;
 }
 
+@media (max-width: 768px) {
+    .chat-header {
+        border-bottom: 1px solid #2f2f2f;
+        padding: 12px 16px;
+    }
+
+    body.claro .chat-header {
+        background-color: #f9f9f9;
+        border-bottom: 1px solid #ddd;
+    }
+}
+
 /* ===== ÁREA DE MENSAJES ===== */
 .chat-messages {
     flex: 1;
