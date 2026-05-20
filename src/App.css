@@ -598,6 +598,9 @@ body.claro .modal-input {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  position: sticky;
+  bottom: 0;
+  background-color: #171717;
 }
 
 .sidebar-user {
