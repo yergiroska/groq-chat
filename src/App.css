@@ -587,3 +587,77 @@ body.claro .modal-input {
   border-color: #ccc;
   color: #1a1a1a;
 }
+
+/* ===== SIDEBAR FOOTER ===== */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px 8px;
+  border-top: 1px solid #2f2f2f;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+  flex: 1;
+}
+
+.sidebar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #2f6feb;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-email {
+  font-size: 13px;
+  color: #ececec;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-logout {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #8e8ea0;
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-logout:hover {
+  background-color: #3f3f3f;
+  color: #e53935;
+}
+
+/* Modo claro */
+body.claro .sidebar-footer {
+  border-top-color: #ddd;
+}
+
+body.claro .sidebar-email {
+  color: #1a1a1a;
+}
+
+body.claro .btn-logout:hover {
+  background-color: #e0e0e0;
+  color: #e53935;
+}
