@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
 import GroqChat from "./GroqChat";
 import "./App.css";
+import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
+import PrivateRoute from "./components/PrivateRoute.jsx";
 
 const crearChat = (id) => ({
   id,
@@ -146,7 +150,7 @@ export default function App() {
     setTema((prev) => (prev === "oscuro" ? "claro" : "oscuro"));
   };
 
-  return (
+  const mainApp = (
       <div className="app-layout">
         {sidebarAbierto && (
             <div className="sidebar-overlay" onClick={() => setSidebarAbierto(false)} />
@@ -307,5 +311,15 @@ export default function App() {
             </div>
         )}
       </div>
+  );
+
+  return (
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/" element={
+          <PrivateRoute>{mainApp}</PrivateRoute>
+        } />
+      </Routes>
   );
 }
