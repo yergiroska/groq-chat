@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Routes, Route } from "react-router-dom";
 import GroqChat from "./GroqChat";
 import "./App.css";
@@ -6,45 +6,20 @@ import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import PrivateRoute from "./components/PrivateRoute.jsx";
 import { useAuth } from "./context/AuthContext.jsx";
+import { obtenerChats, guardarChat, eliminarChat } from "./services/chatService.js";
 
 const crearChat = (id) => ({
   id,
   titulo: "Nuevo chat",
   mensajes: [],
+  creadoEn: Date.now(),
 });
 
-const cargarChatsIniciales = () => {
-  try {
-    const guardados = localStorage.getItem("chats");
-    if (guardados) {
-      const parsed = JSON.parse(guardados);
-      const conMensajes = parsed.filter(c => c.mensajes.length > 0);
-      if (conMensajes.length > 0) return conMensajes;
-    }
-  } catch (e) {
-    console.error("Error al leer localStorage:", e);
-  }
-  return [crearChat(Date.now())];
-};
-
-const cargarChatActivoInicial = (chats) => {
-  try {
-    const guardado = localStorage.getItem("chatActivoId");
-    if (guardado && chats.find((c) => c.id === Number(guardado))) {
-      return Number(guardado);
-    }
-  } catch (e) {
-    console.error("Error al leer chatActivoId:", e);
-  }
-  return chats[0].id;
-};
-
 export default function App() {
-  const [chats, setChats] = useState(cargarChatsIniciales);
-  const [chatActivoId, setChatActivoId] = useState(() => {
-    const inicial = cargarChatsIniciales();
-    return cargarChatActivoInicial(inicial);
-  });
+  const { usuario, logout } = useAuth();
+  const [cargandoChats, setCargandoChats] = useState(true);
+  const [chats, setChats] = useState([crearChat(Date.now())]);
+  const [chatActivoId, setChatActivoId] = useState(null);
   const [chatAEliminar, setChatAEliminar] = useState(null);
   const [tema, setTema] = useState(() => {
     return localStorage.getItem("tema") || "oscuro";
@@ -56,19 +31,37 @@ export default function App() {
   const [chatRenombrando, setChatRenombrando] = useState(null);
   const [nuevoTitulo, setNuevoTitulo] = useState("");
 
+  // Cargar chats desde Firestore al iniciar
   useEffect(() => {
-    try {
-      localStorage.setItem("chats", JSON.stringify(chats));
-    } catch (e) {
-      if (e instanceof Error && e.name === "QuotaExceededError") {
-        console.warn("localStorage lleno: no se pudieron guardar los chats.");
+    if (!usuario) return;
+    const cargar = async () => {
+      setCargandoChats(true);
+      try {
+        const chatsCloud = await obtenerChats(usuario.uid);
+        if (chatsCloud.length > 0) {
+          setChats(chatsCloud);
+          setChatActivoId(chatsCloud[chatsCloud.length - 1].id);
+        } else {
+          const nuevo = crearChat(Date.now());
+          setChats([nuevo]);
+          setChatActivoId(nuevo.id);
+        }
+      } catch (e) {
+        console.error("Error al cargar chats:", e);
+      } finally {
+        setCargandoChats(false);
       }
-    }
-  }, [chats]);
+    };
+    cargar();
+  }, [usuario]);
 
+  // Guardar chats en Firestore cuando cambian
   useEffect(() => {
-    localStorage.setItem("chatActivoId", chatActivoId);
-  }, [chatActivoId]);
+    if (!usuario || cargandoChats) return;
+    chats.forEach((chat) => {
+      guardarChat(usuario.uid, chat);
+    });
+  }, [chats, usuario]);
 
   useEffect(() => {
     document.body.className = tema;
@@ -103,6 +96,9 @@ export default function App() {
   };
 
   const confirmarEliminar = () => {
+    if (usuario) {
+      eliminarChat(usuario.uid, chatAEliminar);
+    }
     const restantes = chats.filter((c) => c.id !== chatAEliminar);
     if (restantes.length === 0) {
       const nuevo = crearChat(Date.now());
@@ -151,7 +147,21 @@ export default function App() {
     setTema((prev) => (prev === "oscuro" ? "claro" : "oscuro"));
   };
 
-  const { usuario, logout } = useAuth();
+  if (cargandoChats) {
+    return (
+        <div style={{
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#212121",
+          color: "#ececec",
+          fontSize: "16px"
+        }}>
+          Cargando...
+        </div>
+    );
+  }
 
   const mainApp = (
       <div className="app-layout">
@@ -223,6 +233,7 @@ export default function App() {
                 </li>
             ))}
           </ul>
+
           {/* FOOTER DEL SIDEBAR */}
           <div className="sidebar-footer">
             <div className="sidebar-user">
